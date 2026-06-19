@@ -1,28 +1,40 @@
-// ex02.ino - Commit 2: 使用millis()实现非阻塞1Hz闪烁
+// ex02.ino - Commit 3: 使用delay()实现SOS求救信号
 
 const int ledPin = 2;
-
-unsigned long previousMillis = 0;
-const long interval = 500;
 
 void setup() {
   Serial.begin(115200);
   pinMode(ledPin, OUTPUT);
-  Serial.println("=== ex02 Commit 2: Millis Blink ===");
+  Serial.println("=== ex02 Commit 3: SOS with delay ===");
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
-  
-  if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;
-    
-    if (digitalRead(ledPin) == LOW) {
-      digitalWrite(ledPin, HIGH);
-      Serial.println("LED ON");
-    } else {
-      digitalWrite(ledPin, LOW);
-      Serial.println("LED OFF");
-    }
+  // S: 短闪3次
+  for(int i = 0; i < 3; i++) {
+    digitalWrite(ledPin, HIGH);
+    delay(200);
+    digitalWrite(ledPin, LOW);
+    delay(200);
   }
+  delay(500);  // 字母间隔
+  
+  // O: 长闪3次
+  for(int i = 0; i < 3; i++) {
+    digitalWrite(ledPin, HIGH);
+    delay(600);
+    digitalWrite(ledPin, LOW);
+    delay(200);
+  }
+  delay(500);  // 字母间隔
+  
+  // S: 短闪3次
+  for(int i = 0; i < 3; i++) {
+    digitalWrite(ledPin, HIGH);
+    delay(200);
+    digitalWrite(ledPin, LOW);
+    delay(200);
+  }
+  delay(2000);  // 单词间隔
+  
+  Serial.println("SOS cycle completed");
 }
