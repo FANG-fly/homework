@@ -1,26 +1,46 @@
-// ex03.ino - Commit 2: LED呼吸灯优化版
+// ex03.ino - Commit 3: 使用millis()实现非阻塞SOS求救信号
 
 const int ledPin = 2;
 
-const int freq = 1000;      // 降低PWM频率
-const int resolution = 8;
+unsigned long previousMillis = 0;
+int step = 0;
+bool ledState = false;
+
+const int timings[] = {
+  200, -200,
+  200, -200,
+  200, -500,
+  
+  600, -200,
+  600, -200,
+  600, -500,
+  
+  200, -200,
+  200, -200,
+  200, -2000
+};
+
+const int totalSteps = sizeof(timings) / sizeof(timings[0]);
 
 void setup() {
   Serial.begin(115200);
-  ledcAttach(ledPin, freq, resolution);
-  Serial.println("=== ex03 Commit 2: Breathing Optimized ===");
+  pinMode(ledPin, OUTPUT);
+  Serial.println("=== ex03 Commit 3: SOS with millis() ===");
 }
 
 void loop() {
-  for(int dutyCycle = 0; dutyCycle <= 255; dutyCycle++) {
-    ledcWrite(ledPin, dutyCycle);
-    delay(5);  // 加快呼吸速度
-  }
+  unsigned long currentMillis = millis();
   
-  for(int dutyCycle = 255; dutyCycle >= 0; dutyCycle--) {
-    ledcWrite(ledPin, dutyCycle);
-    delay(5);
+  if (currentMillis - previousMillis >= abs(timings[step])) {
+    previousMillis = currentMillis;
+    
+    step++;
+    if (step >= totalSteps) {
+      step = 0;
+      Serial.println("SOS cycle completed");
+    }
+    
+    ledState = (timings[step] > 0);
+    digitalWrite(ledPin, ledState ? HIGH : LOW);
   }
-  
-  Serial.println("Breathing cycle V2 completed - faster");
 }
